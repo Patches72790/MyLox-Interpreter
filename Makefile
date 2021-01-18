@@ -4,8 +4,5 @@ run: build
 build:
 	javac mylox/*.java
 
-
-
-
 clean:
 	rm -rf mylox/*.class

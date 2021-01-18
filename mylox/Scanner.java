@@ -42,16 +42,6 @@ public class Scanner {
     }
 
     /**
-     * Helper function to return when the scanner has reached the end of
-     * the source file
-     * 
-     * @return true if at end, false otherwise
-     */
-    private boolean isAtEnd() {
-        return current >= source.length();
-    }
-
-    /**
      * Wrapper method for scanning the entire source string
      * and adding all tokens to list.
      * 
@@ -109,10 +99,18 @@ public class Scanner {
                     while (peek() != '\n' && !isAtEnd()) advance();
                 }
 
-                /* TODO  work on the multi-line comment */
+                /* multi-line comment support */
                 else if (match('*')) {
-                    while (peek() != '*' && !isAtEnd()) advance();
-                    if (match('/')) advance();
+                    while (peek() != '*' && !isAtEnd()) {
+                        if (peek() == '\n') 
+                            line++;
+                        advance();
+                    }
+
+                    // finds final piece of multiline comment
+                    if (match('*') && !match('/'))  {
+                        Lox.error(line, "Error with mutli-line comment.");
+                    }
                 }
 
                 else { // the division operator
@@ -160,6 +158,16 @@ public class Scanner {
     private char advance() {
         current++;
         return source.charAt(current - 1);
+    }
+
+    /**
+     * Helper function to return when the scanner has reached the end of
+     * the source file
+     * 
+     * @return true if at end, false otherwise
+     */
+    private boolean isAtEnd() {
+        return current >= source.length();
     }
 
     /**
@@ -258,7 +266,7 @@ public class Scanner {
 
     /**
      * This function handles identifiers and reserved keywords for the 
-     * scanner.
+     * scanner
      */
     private void identifier() {
         // handles identifiers (variables, functions, etc)

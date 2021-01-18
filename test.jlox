@@ -1,2 +1,14 @@
 var hello = "hello world"
 print hello
+
+// single line comment
+
+/*
+multi
+line
+comment
+*/ newline
+
+if (hello) {
+    print hello
+}

@@ -15,9 +15,10 @@ public class Lox {
     static boolean hadError = false;
 
     /**
+     * This function runs the Lox code from a file.
      * 
-     * @param path
-     * @throws IOException
+     * @param path the path to the file to be run
+     * @throws IOException if error in reading file
      */
     private static void runFile(String path) throws IOException {
 
@@ -30,6 +31,8 @@ public class Lox {
     }
 
     /**
+     * This function runs a REPL prompt interpreter for running code
+     * on the command line.
      * 
      * @throws IOException
      */
@@ -39,7 +42,7 @@ public class Lox {
         BufferedReader reader = new BufferedReader(input);
 
         for (;;) {
-            System.out.print("> ");
+            System.out.print("mylox> ");
             String line = reader.readLine();
             if (line == null)
                 break;
@@ -50,8 +53,10 @@ public class Lox {
 
 
     /**
+     * This function reads through the file or the line from the prompt
+     * and scans the content into tokens.
      * 
-     * @param source
+     * @param source the line of text from a file or from the prompt
      */
     private static void run(String source) {
 
@@ -66,6 +71,7 @@ public class Lox {
 
     /**
      * This method reports an error with the appropriate message and line number.
+     * 
      * @param line
      * @param message
      */
