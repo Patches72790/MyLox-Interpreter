@@ -63,6 +63,13 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
+        // create parser with analyzed tokens
+        Parser parser = new Parser(tokens);
+        Expr expression = parser.parse();
+
+        // stop executing if there was an error encountered
+        if (hadError) return;
+
         // For now, just print the tokens.
         for (Token token : tokens) {
             System.out.println(token);
@@ -77,6 +84,21 @@ public class Lox {
      */
     static void error(int line, String message) {
         report(line, "", message);
+    }
+
+    /**
+     * This reports an error at a given token. It shows the location
+     * and the token itself.
+     * 
+     * @param token the syntactically offending token
+     * @param message the message associated with the error
+     */
+    static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, " at '" + token.lexeme + "'", message);
+        }
     }
 
     /**

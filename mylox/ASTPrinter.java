@@ -33,16 +33,19 @@ public class ASTPrinter implements Expr.Visitor<String> {
     }
  
     private String parenthesize(String name, Expr... exprs) {
-        // todo
         StringBuilder builder = new StringBuilder();
 
-        builder.append("(").append(name);
+        // the prefix version
+        // builder.append("(").append(name);
 
+        builder.append("(");
         for (Expr expr : exprs) {
             builder.append(" ");
             builder.append(expr.accept(this)); // pass in the visitor printer recursively to each expression
         }
 
+        // the postfix version
+        builder.append(" " + name);
         builder.append(")");
         return builder.toString();
     }
@@ -51,12 +54,20 @@ public class ASTPrinter implements Expr.Visitor<String> {
     public static void main(String[] args) {
 
         Expr expression = new Expr.Binary(
-            new Expr.Unary(
-                new Token(TokenType.MINUS, "-", null, 1),
-                new Expr.Literal(123)),
+            new Expr.Binary(
+                new Expr.Literal(1),
+                new Token(TokenType.PLUS, "+", null, 1),
+                new Expr.Literal(2)
+            ),
+
             new Token(TokenType.STAR, "*", null, 1),
-            new Expr.Grouping(
-                new Expr.Literal(45.67)));
+            
+            new Expr.Binary(
+                new Expr.Literal(3),
+                new Token(TokenType.MINUS, "-", null, 1),
+                new Expr.Literal(4)
+            )
+        );
 
         System.out.println(new ASTPrinter().print(expression));
     }
