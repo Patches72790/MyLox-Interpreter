@@ -60,20 +60,25 @@ public class Lox {
      */
     private static void run(String source) {
 
+        // lexically analyze source text and produce list of tokens
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        // create parser with analyzed tokens
+        // parse tokens and return single expression (for now)
         Parser parser = new Parser(tokens);
         Expr expression = parser.parse();
 
         // stop executing if there was an error encountered
         if (hadError) return;
 
+        
         // For now, just print the tokens.
         for (Token token : tokens) {
             System.out.println(token);
-        }
+        } 
+
+        // print expression with AST printer
+        System.out.println(new ASTPrinter().print(expression));
     }
 
     /**

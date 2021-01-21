@@ -157,9 +157,15 @@ public class Parser {
         }
     }
 
-
     private Expr expression() {
-        return equality();
+
+        Expr expr = equality();
+
+        while (match(COMMA)) {            
+            expr = equality();
+        }
+
+        return expr;
     }
 
     private Expr equality() {
