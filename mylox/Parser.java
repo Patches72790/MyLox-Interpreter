@@ -161,6 +161,22 @@ public class Parser {
 
         Expr expr = equality();
 
+
+        if (match(QUESTION)) {
+            Expr first = equality();
+            Expr second;
+
+            if (match(COLON)) {
+                second = equality();
+
+                // just going to always return first until
+                // assignment and evaluation are implemented
+                return first;
+            }
+
+            throw error(peek(), "Expected colon for ternary expression.");
+        }
+
         while (match(COMMA)) {            
             expr = equality();
         }

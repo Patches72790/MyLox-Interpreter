@@ -6,6 +6,7 @@ build:
 	@javac tool/GenerateAST.java
 
 build-ast: build
+	@rm -f Expr*
 	@java tool.GenerateAST mylox
 
 clean:

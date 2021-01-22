@@ -78,6 +78,9 @@ public class Scanner {
             case '+': addToken(PLUS); break;
             case ';': addToken(SEMICOLON); break;
             case '*': addToken(STAR); break; 
+            // added cases for ternary operator
+            case '?': addToken(QUESTION); break;
+            case ':': addToken(COLON); break;
 
             /*  Deals with double char operators with single lookahead*/
             case '!':
