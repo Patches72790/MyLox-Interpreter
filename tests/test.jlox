@@ -1,4 +1,21 @@
-print 1234;
-print 3 + 5;
-print "one, two, three";
-
+var a = "global a";
+var b = "global b";
+var c = "global c";
+{
+  var a = "outer a";
+  var b = "outer b";
+  {
+    var a = "inner a";
+    var d = "inner d";
+    print a;
+    print b;
+    print c;
+    print d;
+  }
+  print a;
+  print b;
+  print c;
+}
+print a;
+print b;
+print c;

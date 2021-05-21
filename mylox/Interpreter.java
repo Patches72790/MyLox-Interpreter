@@ -1,11 +1,14 @@
 package mylox;
 
 import java.util.List;
+
+import mylox.Expr.Assign;
 import mylox.Expr.Binary;
 import mylox.Expr.Grouping;
 import mylox.Expr.Literal;
 import mylox.Expr.Unary;
 import mylox.Expr.Variable;
+import mylox.Stmt.Block;
 import mylox.Stmt.Expression;
 import mylox.Stmt.Print;
 import mylox.Stmt.Var;
@@ -167,6 +170,29 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
 
     /**
+     * 
+     * @param statements
+     * @param environment
+     */
+    void executeBlock(List<Stmt> statements, Environment environment) {
+        // save the previous global environment
+        Environment previous = this.environment;
+
+        try {
+            // set interpreters current scope to inner scope of statement
+            this.environment = environment;
+
+            // execute all statements in list
+            for (Stmt statement : statements) {
+                execute(statement);
+            }
+        } finally {
+            // restore global environment to interpreter
+            this.environment = previous;
+        }
+    }   
+
+    /**
      * Converts literal expressions into its corresponding
      * runtime value.
      */
@@ -295,5 +321,19 @@ public class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Object visitVariableExpr(Variable expr) {
         return environment.get(expr.name);
+    }
+
+
+    @Override
+    public Object visitAssignExpr(Assign expr) {
+        Object value = evaluate(expr.value);
+        environment.assign(expr.name, value);
+        return value;
+    }
+
+    @Override
+    public Void visitBlockStmt(Block stmt) {
+        executeBlock(stmt.statements, new Environment(environment));
+        return null;
     }    
 }

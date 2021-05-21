@@ -159,9 +159,9 @@ public class Parser {
     }
 
 
-//////////////////////////////////////////////////////
-//    Methods for parsing expressions below         //
-//////////////////////////////////////////////////////
+///////////////////////////////////////////////////////////////
+//    Methods for parsing declaration, stmt, and expr below  //
+///////////////////////////////////////////////////////////////
 
     List<Stmt> parse() {
         List<Stmt> statements = new ArrayList<>();
@@ -211,8 +211,22 @@ public class Parser {
 
     private Stmt statement() {
         if (match(PRINT)) return printStatement();
+        if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private List<Stmt> block() {
+        List<Stmt> statements = new ArrayList<>();
+
+        // continue to add declarations until reach right brace
+        // or EOF
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            statements.add(declaration());
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after block.");
+        return statements;
     }
 
     private Stmt printStatement() {
@@ -234,43 +248,6 @@ public class Parser {
 /////////////////////////////////////////////////
 
     private Expr expression() {
-
-        // error handling for dangling binary operator
-        if (match ( MINUS, PLUS, SLASH, STAR, AND, OR, BANG_EQUAL, 
-        EQUAL_EQUAL, LESS, GREATER, LESS_EQUAL, GREATER_EQUAL )) {
-
-            // parse righhand side
-            Expr right = equality();
-
-            throw error(previouser(), "Unexpected binary operator at beginning of expression.");
-        }
-
-        Expr expr = equality();
-
-        // parsing for ternary operation
-        if (match(QUESTION)) {
-            Expr first = equality();
-            Expr second;
-
-            if (match(COLON)) {
-                second = equality();
-
-                // just going to always return first until
-                // assignment and evaluation are implemented
-
-                // todo -- fix the correct assignment rule for ternary op
-                // if ( ((Expr.Literal) expr ).value == true ) {} 
-
-                return first;
-            }
-
-            throw error(peek(), "Expected colon for ternary expression.");
-        }
-
-        while (match(COMMA)) {            
-            expr = equality();
-        }
-
         return assignment();
     }
 
@@ -292,6 +269,26 @@ public class Parser {
 
             // if something other than variable used as L-value
             error(equals, "Invalid assignment target.");
+        }
+
+        // parsing for ternary operation
+        if (match(QUESTION)) {
+            Expr first = equality();
+            Expr second;
+
+            if (match(COLON)) {
+                second = equality();
+
+                // just going to always return first until
+                // assignment and evaluation are implemented
+
+                // todo -- fix the correct assignment rule for ternary op
+                // if ( ((Expr.Literal) expr ).value == true ) {} 
+
+                return first;
+            }
+
+            throw error(peek(), "Expected colon for ternary expression.");
         }
 
         return expr;
