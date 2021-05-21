@@ -11,8 +11,15 @@ import java.util.List;
 
 public class Lox {
 
+    private static final Interpreter interpreter = new Interpreter();
+
     // error flag for error handling in run
     static boolean hadError = false;
+    // error flag for handling runtime errors
+    static boolean hadRuntimeError = false;
+
+    static boolean scannerDebug = false;
+    static boolean parserDebug = false;
 
     /**
      * This function runs the Lox code from a file.
@@ -28,6 +35,8 @@ public class Lox {
 
         // if an error occurs in running a file, exit gracefully
         if (hadError) System.exit(65);
+        // exit gracefully for runtime error
+        if (hadRuntimeError) System.exit(70);
     }
 
     /**
@@ -47,10 +56,10 @@ public class Lox {
             if (line == null)
                 break;
             run(line);
-            hadError = false; // reset error flag
+            hadError = false; // reset error flags for prompt and read new line
+            hadRuntimeError = false;
         }
     }
-
 
     /**
      * This function reads through the file or the line from the prompt
@@ -66,19 +75,25 @@ public class Lox {
 
         // parse tokens and return single expression (for now)
         Parser parser = new Parser(tokens);
-        Expr expression = parser.parse();
+        List<Stmt> statements = parser.parse();
 
         // stop executing if there was an error encountered
         if (hadError) return;
 
-        
         // For now, just print the tokens.
-        for (Token token : tokens) {
-            System.out.println(token);
-        } 
+
+        if (scannerDebug) {
+            for (Token token : tokens) {
+                System.out.println(token);
+            } 
+        }
 
         // print expression with AST printer
-        System.out.println(new ASTPrinter().print(expression));
+        // if (parserDebug)
+        //     System.out.println(new ASTPrinter().print(statements));
+
+        // print interpreted expression
+        interpreter.interpret(statements);
     }
 
     /**
@@ -120,6 +135,11 @@ public class Lox {
         hadError = true;
     }
 
+    static void runtimeError(RuntimeError error) {
+        System.err.println(error.getMessage() + "\n[line " + error.token.line + "]");
+        hadRuntimeError = true;
+    }
+
     /**
      * 
      * @param args
@@ -128,7 +148,7 @@ public class Lox {
     public static void main(String[] args) throws IOException {
 
         if (args.length > 1) {
-            System.out.println("Usage: jlox [script]");
+            System.out.println("Usage: mylox <options> [script]");
             System.exit(64);
         }
 

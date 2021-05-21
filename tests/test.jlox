@@ -1,14 +1,4 @@
-var hello = "hello world"
-print hello
+print 1234;
+print 3 + 5;
+print "one, two, three";
 
-// single line comment
-
-/*
-multi
-line
-comment
-*/ newline
-
-if (hello) {
-    print hello
-}

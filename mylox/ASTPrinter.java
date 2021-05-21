@@ -4,6 +4,7 @@ import mylox.Expr.Binary;
 import mylox.Expr.Grouping;
 import mylox.Expr.Literal;
 import mylox.Expr.Unary;
+import mylox.Expr.Variable;
 
 public class ASTPrinter implements Expr.Visitor<String> {
 
@@ -70,5 +71,10 @@ public class ASTPrinter implements Expr.Visitor<String> {
         );
 
         System.out.println(new ASTPrinter().print(expression));
+    }
+
+    @Override
+    public String visitVariableExpr(Variable expr) {
+        return null;
     }
 }

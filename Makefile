@@ -1,9 +1,12 @@
 run: build
-	java mylox/Lox
+	@java mylox/Lox
 
 build:
 	@javac mylox/*.java
 	@javac tool/GenerateAST.java
+
+debug: build
+	@java mylox.Lox -S -P
 
 build-ast: build
 	@rm -f Expr*

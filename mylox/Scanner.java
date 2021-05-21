@@ -300,6 +300,7 @@ public class Scanner {
         // never terminated string
         if (isAtEnd()) {
             Lox.error(line, "Unterminated string.");
+            return;
         }
 
         // closing "
@@ -326,6 +327,7 @@ public class Scanner {
             while (isDigit(peek())) advance();
         }
 
-        addToken(NUMBER, source.substring(start, current));
+        // make sure to use Double, not string for making token
+        addToken(NUMBER, Double.parseDouble(source.substring(start, current)));
     }
 }

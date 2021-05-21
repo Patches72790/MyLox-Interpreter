@@ -1,5 +1,6 @@
 package mylox;
 
+import java.util.ArrayList;
 import java.util.List;
 import static mylox.TokenType.*;
 
@@ -144,24 +145,109 @@ public class Parser {
         return tokens.get(current - 1);
     }
 
+    /**
+     * Finds the previouser token (current - 2) and returns it without 
+     * regressing the parser.
+     * 
+     * This method is primarily used for error handling for dangling binary
+     * operators.
+     * 
+     * @return the current - 2 token, if it exists.
+     */
+    private Token previouser() {
+        return tokens.get(current - 2);
+    }
+
 
 //////////////////////////////////////////////////////
 //    Methods for parsing expressions below         //
 //////////////////////////////////////////////////////
 
-    Expr parse() {
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+        while (!isAtEnd()) {
+            statements.add(declaration());
+        }
+
+        return statements;
+    }
+
+/////////////////////////////////////////////////
+//
+// Declarations below
+//
+/////////////////////////////////////////////////
+
+    private Stmt declaration() {
         try {
-            return expression();
+            if (match(VAR)) return varDeclaration();
+
+            return statement();
         } catch (ParseError error) {
+            synchronize();
             return null;
         }
     }
 
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name.");
+
+        Expr initializer = null;
+        if (match(EQUAL)) { // make sure initializing expression after
+            initializer = expression(); // parse expression initialization
+        }
+
+        // consume semicolon and return stmt var ast node
+        consume(SEMICOLON, "Expect ';' after variable declaration");
+        return new Stmt.Var(name, initializer);
+    }
+
+
+/////////////////////////////////////////////////
+//
+// Statements below
+//
+/////////////////////////////////////////////////
+
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Print(value);
+    }
+
+    private Stmt expressionStatement() {
+        Expr expr = expression();
+        consume(SEMICOLON, "Expect ';' after value.");
+        return new Stmt.Expression(expr);
+    }
+
+/////////////////////////////////////////////////
+//
+// Expressions below
+//
+/////////////////////////////////////////////////
+
     private Expr expression() {
+
+        // error handling for dangling binary operator
+        if (match ( MINUS, PLUS, SLASH, STAR, AND, OR, BANG_EQUAL, 
+        EQUAL_EQUAL, LESS, GREATER, LESS_EQUAL, GREATER_EQUAL )) {
+
+            // parse righhand side
+            Expr right = equality();
+
+            throw error(previouser(), "Unexpected binary operator at beginning of expression.");
+        }
 
         Expr expr = equality();
 
-
+        // parsing for ternary operation
         if (match(QUESTION)) {
             Expr first = equality();
             Expr second;
@@ -171,6 +257,10 @@ public class Parser {
 
                 // just going to always return first until
                 // assignment and evaluation are implemented
+
+                // todo -- fix the correct assignment rule for ternary op
+                // if ( ((Expr.Literal) expr ).value == true ) {} 
+
                 return first;
             }
 
@@ -179,6 +269,29 @@ public class Parser {
 
         while (match(COMMA)) {            
             expr = equality();
+        }
+
+        return assignment();
+    }
+
+    private Expr assignment() {
+        Expr expr = equality();
+
+        // assignment 
+        if (match(EQUAL)) {
+            // capture assign token
+            Token equals = previous();
+            // parse r-value on RHS
+            Expr value = assignment();
+
+            // if lhs was a variable (i.e. L-value)
+            if (expr instanceof Expr.Variable) {
+                Token name = ((Expr.Variable)expr).name;
+                return new Expr.Assign(name, value);
+            }
+
+            // if something other than variable used as L-value
+            error(equals, "Invalid assignment target.");
         }
 
         return expr;
@@ -249,8 +362,14 @@ public class Parser {
         if ( match(TRUE))  return new Expr.Literal(true);
         if ( match(NIL))   return new Expr.Literal(null);
 
+        // parse literals
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        // parse identifier 
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
         }
 
         if (match(LEFT_PAREN)) {
