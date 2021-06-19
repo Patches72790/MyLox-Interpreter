@@ -73,9 +73,11 @@ public class Lox {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        // parse tokens and return single expression (for now)
+        // parse tokens for statements
         Parser parser = new Parser(tokens);
         List<Stmt> statements = parser.parse();
+
+        
 
         // stop executing if there was an error encountered
         if (hadError) return;

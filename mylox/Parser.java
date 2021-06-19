@@ -100,7 +100,7 @@ public class Parser {
     }
 
     /**
-     * Peek at the next token's type to match the given paramater type.
+     * Peek at the next token's type to match the given parameter type.
      * 
      * @param type the type of the current token
      * @return true if type matches the next token's type
@@ -210,10 +210,28 @@ public class Parser {
 /////////////////////////////////////////////////
 
     private Stmt statement() {
+        if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
+    }
+
+    private Stmt ifStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'if'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+        Stmt thenBranch = statement();
+        Stmt elseBranch = null;
+
+        // optional else statement
+        // dangling else always chooses nearest if
+        if (match(ELSE)) {
+            elseBranch = statement();
+        }
+
+        return new Stmt.If(condition, thenBranch, elseBranch);
     }
 
     private List<Stmt> block() {
@@ -264,31 +282,31 @@ public class Parser {
             // if lhs was a variable (i.e. L-value)
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable)expr).name;
+
+                /* TODO -- parsing for ternary operator
+                // parsing for ternary operation
+                if (match(QUESTION)) {
+                    Expr first = equality();
+                    Expr second;
+
+                    if (match(COLON)) {
+                        second = equality();
+
+                        // just going to always return first until
+                        // assignment and evaluation are implemented
+
+                        // todo -- fix the correct assignment rule for ternary op
+                    } else {
+                        throw error(peek(), "Expected colon for ternary expression.");
+                    }
+                }
+                */
+
                 return new Expr.Assign(name, value);
             }
 
             // if something other than variable used as L-value
             error(equals, "Invalid assignment target.");
-        }
-
-        // parsing for ternary operation
-        if (match(QUESTION)) {
-            Expr first = equality();
-            Expr second;
-
-            if (match(COLON)) {
-                second = equality();
-
-                // just going to always return first until
-                // assignment and evaluation are implemented
-
-                // todo -- fix the correct assignment rule for ternary op
-                // if ( ((Expr.Literal) expr ).value == true ) {} 
-
-                return first;
-            }
-
-            throw error(peek(), "Expected colon for ternary expression.");
         }
 
         return expr;

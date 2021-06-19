@@ -6,10 +6,12 @@ import mylox.Expr.Assign;
 import mylox.Expr.Binary;
 import mylox.Expr.Grouping;
 import mylox.Expr.Literal;
+import mylox.Expr.Logical;
 import mylox.Expr.Unary;
 import mylox.Expr.Variable;
 import mylox.Stmt.Block;
 import mylox.Stmt.Expression;
+import mylox.Stmt.If;
 import mylox.Stmt.Print;
 import mylox.Stmt.Var;
 
@@ -282,12 +284,30 @@ public class Interpreter implements Expr.Visitor<Object>,
     private boolean isTruthy(Object object) {
         if (object == null) return false;
         if (object instanceof Boolean) return (boolean) object;
+        // empty strings are false
+        if (object instanceof String) {
+            return ((String) object).length() != 0;
+//            if (((String)object).length() == 0) return false;
+//            else return true;
+        }
+        // number zero is false
+        if (object instanceof Double) {
+            return ((Double) object).doubleValue() != 0;
+//            if (((Double)object).doubleValue() == 0) return false;
+//            else return true;
+        }
         return true;
     }
 
 
     public Void visitExpressionStmt(Stmt.Expression stmt) {
-        evaluate(stmt.expression);
+        Object exprResult = evaluate(stmt.expression);
+
+        // for evaluating simple expressions in interpreter
+        if (exprResult != null) {
+            System.out.println(exprResult);
+        }
+
         return null;
     }
 
@@ -320,7 +340,17 @@ public class Interpreter implements Expr.Visitor<Object>,
      */
     @Override
     public Object visitVariableExpr(Variable expr) {
-        return environment.get(expr.name);
+        // lookup id in environment
+        Object valueAtVarId = environment.get(expr.name);
+
+        // return value if initialized / contains data
+        if (valueAtVarId != null) {
+            return valueAtVarId;
+        }
+
+        // throw an error if identifier is not initialized to anything
+        throw new RuntimeError(expr.name, "Error: variable '"
+        + expr.name.lexeme + "' is not initialized.");
     }
 
 
@@ -334,6 +364,28 @@ public class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Void visitBlockStmt(Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
+        return null;
+    }
+
+    @Override
+    public Void visitIfStmt(If stmt) {
+        if (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.thenBranch);
+        }
+        // check that else branch present
+        else if (stmt.elseBranch != null) {
+            execute(stmt.elseBranch);
+        }
+
+        return null;
+    }
+
+    @Override
+    public Object visitLogicalExpr(Logical expr) {
+        // TODO Auto-generated method stub
+        
+
+
         return null;
     }    
 }
