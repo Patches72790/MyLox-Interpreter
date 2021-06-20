@@ -11,13 +11,12 @@ import mylox.Expr.Unary;
 import mylox.Expr.Variable;
 import mylox.Stmt.Block;
 import mylox.Stmt.Break;
-import mylox.Stmt.Continue;
 import mylox.Stmt.Expression;
 import mylox.Stmt.If;
 import mylox.Stmt.Print;
 import mylox.Stmt.Var;
 import mylox.Stmt.While;
-
+import mylox.BreakException;
 /**
  * This class supports the interpreting of expressions 
  * built from the Parser abstract syntax trees of this lox language.
@@ -42,6 +41,8 @@ public class Interpreter implements Expr.Visitor<Object>,
             }
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
+        } catch (BreakException breakExcpt) {
+            Lox.error(0, "Error found break exception outside of control flow.");
         }
     }
 
@@ -190,12 +191,6 @@ public class Interpreter implements Expr.Visitor<Object>,
             // execute all statements in list
             for (Stmt statement : statements) {
                 execute(statement);
-
-                if (statement.hadBreak()) {
-                    break;
-                } else if (statement.hadContinue()) {
-                    continue;
-                }
             }
         } finally {
             // restore global environment to interpreter
@@ -374,15 +369,6 @@ public class Interpreter implements Expr.Visitor<Object>,
     public Void visitBlockStmt(Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
 
-        // check for breaks or continue statements 
-        for (Stmt statement : stmt.statements) {
-            if (statement.hadBreak()) {
-                stmt.setHadBreak();
-            } else if (statement.hadContinue()) {
-                stmt.setHadContinue();
-            }
-        }
-
         return null;
     }
 
@@ -390,14 +376,10 @@ public class Interpreter implements Expr.Visitor<Object>,
     public Void visitIfStmt(If stmt) {
         if (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.thenBranch);
-            if (stmt.thenBranch.hadBreak())
-                stmt.setHadBreak();
         }
         // check that else branch present
         else if (stmt.elseBranch != null) {
             execute(stmt.elseBranch);
-            if (stmt.elseBranch.hadBreak()) 
-                stmt.setHadBreak();
         }
 
         return null;
@@ -421,11 +403,9 @@ public class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Void visitWhileStmt(While stmt) {
         while (isTruthy(evaluate(stmt.condition))) {
-            execute(stmt.body);
-
-            // check for break statement
-            if (stmt.body.hadBreak()) {
-//                stmt.setHadBreak();
+            try {
+                execute(stmt.body);
+            } catch (BreakException be) {
                 break;
             }
         }
@@ -434,14 +414,7 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
 
     @Override
-    public Void visitBreakStmt(Break stmt) {
-        stmt.setHadBreak();
-        return null;
+    public Void visitBreakStmt(Stmt.Break stmt) {
+        throw new BreakException(stmt);
     }
-
-    @Override
-    public Void visitContinueStmt(Continue stmt) {
-        stmt.setHadContinue();
-        return null;
-    }    
 }

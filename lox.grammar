@@ -17,13 +17,11 @@ statement      : exprStmt
                | printStmt
                | returnStmt
                | block
-               | controlStmt ;
-
-controlStmt    : forStmt
+               | controlStmt
+               | forStmt
                | ifStmt
                | whileStmt
-               | breakStmt
-               | continueStmt ;
+               | breakStmt ;
 
 exprStmt       : expression ";" ;
 forStmt        : "for" "(" ( varDecl | exprStmt | ";" )

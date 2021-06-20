@@ -34,12 +34,10 @@ public class GenerateAST {
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, Expr initializer",
-            "Break      : none",
-            "Continue   : none"
+            "Break      : Token breakToken"
         ),
         Arrays.asList(
-            "hadBreak",
-            "hadContinue"
+            "hadBreak"
         ));
     }
 

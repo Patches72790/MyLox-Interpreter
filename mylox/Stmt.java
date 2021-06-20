@@ -11,7 +11,6 @@ abstract class Stmt {
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
     R visitBreakStmt(Break stmt);
-    R visitContinueStmt(Continue stmt);
   }
 
   private boolean hadBreak = false;
@@ -20,13 +19,6 @@ abstract class Stmt {
   }
   void setHadBreak() {
     this.hadBreak = true;
-  }
-  private boolean hadContinue = false;
-  boolean hadContinue() {
-    return hadContinue;
-  }
-  void setHadContinue() {
-    this.hadContinue = true;
   }
 
   static class If extends Stmt {
@@ -110,18 +102,16 @@ abstract class Stmt {
     final Expr initializer;
   }
   static class Break extends Stmt {
+    Break(Token breakToken) {
+      this.breakToken = breakToken;
+    }
 
     @Override
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitBreakStmt(this);
     }
-  }
-  static class Continue extends Stmt {
 
-    @Override
-    <R> R accept(Visitor<R> visitor) {
-      return visitor.visitContinueStmt(this);
-    }
+    final Token breakToken;
   }
 
   abstract <R> R accept(Visitor<R> visitor);

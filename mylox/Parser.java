@@ -220,17 +220,10 @@ public class Parser {
 
         return expressionStatement();
     }
-   
-    private Stmt controlStatement() {
-        
-
-
-        return null;
-    }
 
     private Stmt breakStatement() {
         consume(SEMICOLON, "Expect ';' after break.");
-        return new Stmt.Break();
+        return new Stmt.Break(new Token(BREAK, "break", null, current));
     }
 
     private Stmt forStatement() {
