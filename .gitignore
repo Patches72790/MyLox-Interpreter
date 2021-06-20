@@ -1,3 +1,5 @@
 mylox/*.class
 .vscode/
 tests/*
+tool/*.class
+
