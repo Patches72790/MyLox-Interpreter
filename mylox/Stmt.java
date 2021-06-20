@@ -13,6 +13,22 @@ abstract class Stmt {
     R visitBreakStmt(Break stmt);
     R visitContinueStmt(Continue stmt);
   }
+
+  private boolean hadBreak = false;
+  boolean hadBreak() {
+    return hadBreak;
+  }
+  void setHadBreak() {
+    this.hadBreak = true;
+  }
+  private boolean hadContinue = false;
+  boolean hadContinue() {
+    return hadContinue;
+  }
+  void setHadContinue() {
+    this.hadContinue = true;
+  }
+
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
       this.condition = condition;

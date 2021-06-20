@@ -14,14 +14,16 @@ varDecl        : "var" IDENTIFIER ( "=" expression )? ";" ;
 -----------------------STATEMENTS------------------------------
 
 statement      : exprStmt
-               | forStmt
-               | ifStmt
                | printStmt
                | returnStmt
+               | block
+               | controlStmt ;
+
+controlStmt    : forStmt
+               | ifStmt
                | whileStmt
                | breakStmt
-               | continueStmt
-               | block ;
+               | continueStmt ;
 
 exprStmt       : expression ";" ;
 forStmt        : "for" "(" ( varDecl | exprStmt | ";" )
@@ -33,7 +35,8 @@ printStmt      : "print" expression ";" ;
 returnStmt     : "return" expression? ";" ;
 whileStmt      : "while" "(" expression ")" statement ;
 block          : "{" declaration* "}" ;
-
+breakStmt      : "break" ";" ;
+continueStmt   : "continue" ";" ;
 
 -----------------------ADDITIONAL UTILITY RULES--------------------------
 

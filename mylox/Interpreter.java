@@ -189,8 +189,13 @@ public class Interpreter implements Expr.Visitor<Object>,
 
             // execute all statements in list
             for (Stmt statement : statements) {
-                // check for statement as instance of Break or Continue
                 execute(statement);
+
+                if (statement.hadBreak()) {
+                    break;
+                } else if (statement.hadContinue()) {
+                    continue;
+                }
             }
         } finally {
             // restore global environment to interpreter
@@ -309,7 +314,7 @@ public class Interpreter implements Expr.Visitor<Object>,
 
         // for evaluating simple expressions in interpreter
         if (exprResult != null) {
-            System.out.println(exprResult);
+           // System.out.println(exprResult);
         }
 
         return null;
@@ -368,6 +373,16 @@ public class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Void visitBlockStmt(Block stmt) {
         executeBlock(stmt.statements, new Environment(environment));
+
+        // check for breaks or continue statements 
+        for (Stmt statement : stmt.statements) {
+            if (statement.hadBreak()) {
+                stmt.setHadBreak();
+            } else if (statement.hadContinue()) {
+                stmt.setHadContinue();
+            }
+        }
+
         return null;
     }
 
@@ -375,10 +390,14 @@ public class Interpreter implements Expr.Visitor<Object>,
     public Void visitIfStmt(If stmt) {
         if (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.thenBranch);
+            if (stmt.thenBranch.hadBreak())
+                stmt.setHadBreak();
         }
         // check that else branch present
         else if (stmt.elseBranch != null) {
             execute(stmt.elseBranch);
+            if (stmt.elseBranch.hadBreak()) 
+                stmt.setHadBreak();
         }
 
         return null;
@@ -403,6 +422,12 @@ public class Interpreter implements Expr.Visitor<Object>,
     public Void visitWhileStmt(While stmt) {
         while (isTruthy(evaluate(stmt.condition))) {
             execute(stmt.body);
+
+            // check for break statement
+            if (stmt.body.hadBreak()) {
+//                stmt.setHadBreak();
+                break;
+            }
         }
 
         return null;
@@ -410,13 +435,13 @@ public class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Void visitBreakStmt(Break stmt) {
-        // TODO Auto-generated method stub
+        stmt.setHadBreak();
         return null;
     }
 
     @Override
     public Void visitContinueStmt(Continue stmt) {
-        // TODO Auto-generated method stub
+        stmt.setHadContinue();
         return null;
     }    
 }

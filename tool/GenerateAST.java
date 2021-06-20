@@ -24,7 +24,7 @@ public class GenerateAST {
             "Unary    : Token operator, Expr right",
             "Variable : Token name",
             "Assign   : Token name, Expr value"
-        ));
+        ), null);
 
         defineAst(outputDir, "Stmt", Arrays.asList(
             "If         : Expr condition, Stmt thenBranch," +
@@ -36,10 +36,14 @@ public class GenerateAST {
             "Var        : Token name, Expr initializer",
             "Break      : none",
             "Continue   : none"
+        ),
+        Arrays.asList(
+            "hadBreak",
+            "hadContinue"
         ));
     }
 
-    private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
+    private static void defineAst(String outputDir, String baseName, List<String> types, List<String> optionalSharedFields) throws IOException {
 
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
@@ -52,6 +56,11 @@ public class GenerateAST {
 
         // define visitor method
         defineVisitor(writer, baseName, types);
+
+        // write in optional shared fields
+        if (optionalSharedFields != null) {
+            defineSharedFields(writer, optionalSharedFields);
+        }
 
         // ast classes
         for (String type : types) {
@@ -118,4 +127,18 @@ public class GenerateAST {
 
         writer.println("  }");
     }
+
+    private static void defineSharedFields(PrintWriter writer, List<String> optionalSharedFields) {
+        writer.println();
+
+        for (String field : optionalSharedFields) {
+            writer.println("  private boolean " + field + " = false;");
+            writer.println("  boolean " + field + "() {\n    return " + field + ";\n  }");
+            String fieldMethodName = field.substring(0, 1).toUpperCase() + field.substring(1, field.length());
+            writer.println("  void set" + fieldMethodName + "() {\n    this." + field + " = true;\n  }");
+        }
+
+        writer.println();
+    }
 }
+
