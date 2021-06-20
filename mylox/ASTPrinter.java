@@ -4,6 +4,7 @@ import mylox.Expr.Assign;
 import mylox.Expr.Binary;
 import mylox.Expr.Grouping;
 import mylox.Expr.Literal;
+import mylox.Expr.Logical;
 import mylox.Expr.Unary;
 import mylox.Expr.Variable;
 
@@ -81,6 +82,12 @@ public class ASTPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitAssignExpr(Assign expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitLogicalExpr(Logical expr) {
         // TODO Auto-generated method stub
         return null;
     }

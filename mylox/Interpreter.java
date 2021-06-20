@@ -382,10 +382,14 @@ public class Interpreter implements Expr.Visitor<Object>,
 
     @Override
     public Object visitLogicalExpr(Logical expr) {
-        // TODO Auto-generated method stub
-        
+        Object left = evaluate(expr.left);
 
+        if (expr.operator.type == TokenType.OR) {
+            if (isTruthy(left)) return left;
+        } else {
+            if (!isTruthy(left)) return left;
+        }
 
-        return null;
+        return evaluate(expr.right);
     }    
 }
