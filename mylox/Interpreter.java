@@ -14,6 +14,7 @@ import mylox.Stmt.Expression;
 import mylox.Stmt.If;
 import mylox.Stmt.Print;
 import mylox.Stmt.Var;
+import mylox.Stmt.While;
 
 /**
  * This class supports the interpreting of expressions 
@@ -384,12 +385,23 @@ public class Interpreter implements Expr.Visitor<Object>,
     public Object visitLogicalExpr(Logical expr) {
         Object left = evaluate(expr.left);
 
+        // or can short circuit if left evaluates to true
         if (expr.operator.type == TokenType.OR) {
             if (isTruthy(left)) return left;
         } else {
+            // and short circuits if false
             if (!isTruthy(left)) return left;
         }
 
         return evaluate(expr.right);
+    }
+
+    @Override
+    public Void visitWhileStmt(While stmt) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            execute(stmt.body);
+        }
+
+        return null;
     }    
 }

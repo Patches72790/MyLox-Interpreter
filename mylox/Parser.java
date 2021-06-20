@@ -1,6 +1,7 @@
 package mylox;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import static mylox.TokenType.*;
 
@@ -210,12 +211,66 @@ public class Parser {
 /////////////////////////////////////////////////
 
     private Stmt statement() {
+        if (match(FOR)) return forStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
+        if (match(WHILE)) return whileStatement();
         if (match(LEFT_BRACE)) return new Stmt.Block(block());
 
         return expressionStatement();
     }
+    
+    private Stmt forStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+        // parse initialization
+        Stmt initializer;
+        if (match(SEMICOLON)) {
+            initializer = null;
+        } else if (match(VAR)) {
+            initializer = varDeclaration();
+        } else {
+            initializer = expressionStatement();
+        }
+
+        // parse condition part
+        Expr condition = null;
+        if (!check(SEMICOLON)) {
+            condition = expression();
+        }
+        consume(SEMICOLON, "Expect ';' after loop condition.");
+
+        // parse increment part
+        Expr increment = null;
+        if (!check(RIGHT_PAREN)) {
+            increment = expression();    
+        }
+        consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+        
+        // parse for body
+        Stmt body = statement();
+
+        // the increment is executed as final statement of block
+        if (increment != null) {
+            body = new Stmt.Block(
+                Arrays.asList(
+                    body,
+                    new Stmt.Expression(increment)));
+        }
+
+        // wrap the body in a while loop with condition expression
+        if (condition == null) condition = new Expr.Literal(true);
+        body = new Stmt.While(condition, body);
+
+        // the initializer if present wraps the while loop since
+        // it is executed once at the beginning of the loop
+        if (initializer != null) {
+            body = new Stmt.Block(Arrays.asList(initializer, body));
+        }
+
+        return body;
+    }
+
 
     private Stmt ifStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'if'.");
@@ -232,6 +287,15 @@ public class Parser {
         }
 
         return new Stmt.If(condition, thenBranch, elseBranch);
+    }
+
+    private Stmt whileStatement() {
+        consume(LEFT_PAREN, "Expect '(' after 'while'.");
+        Expr condition = expression();
+        consume(RIGHT_PAREN, "Expect ')' after condition.");
+        Stmt body = statement();
+
+        return new Stmt.While(condition, body);
     }
 
     private List<Stmt> block() {

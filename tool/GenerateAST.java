@@ -30,6 +30,8 @@ public class GenerateAST {
             "If         : Expr condition, Stmt thenBranch," +
                         " Stmt elseBranch",
             "Block      : List<Stmt> statements",
+            "While      : Expr condition, Stmt body",
+//            "For        : Stmt initializer, Expr condition, Expr increment, Stmt body", // optional AST node for FOR loop -- implemented already in Parser
             "Expression : Expr expression",
             "Print      : Expr expression",
             "Var        : Token name, Expr initializer"
