@@ -212,6 +212,7 @@ public class Parser {
 
     private Stmt statement() {
         if (match(FOR)) return forStatement();
+        // if (match(BREAK)) return breakStatement();
         if (match(IF)) return ifStatement();
         if (match(PRINT)) return printStatement();
         if (match(WHILE)) return whileStatement();
@@ -220,6 +221,15 @@ public class Parser {
         return expressionStatement();
     }
     
+    private Stmt breakStatement() {
+        consume(SEMICOLON, "Expect ';' after break.");
+        // TODO what to do for break statements in the interpreter?
+        // should I return a special type of AST node that would
+        // trigger a break from the while loop visitor?
+        
+        return null;
+    }
+
     private Stmt forStatement() {
         consume(LEFT_PAREN, "Expect '(' after 'for'.");
 

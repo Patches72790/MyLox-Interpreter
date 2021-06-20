@@ -31,10 +31,11 @@ public class GenerateAST {
                         " Stmt elseBranch",
             "Block      : List<Stmt> statements",
             "While      : Expr condition, Stmt body",
-//            "For        : Stmt initializer, Expr condition, Expr increment, Stmt body", // optional AST node for FOR loop -- implemented already in Parser
             "Expression : Expr expression",
             "Print      : Expr expression",
-            "Var        : Token name, Expr initializer"
+            "Var        : Token name, Expr initializer",
+            "Break      : none",
+            "Continue   : none"
         ));
     }
 
@@ -72,18 +73,21 @@ public class GenerateAST {
 
         writer.println("  static class " + className + " extends " + baseName + " {");
 
-        // constructor
-        writer.println("    " + className + "(" + fieldList + ") {");
-
         // store params in fields
         String[] fields = fieldList.split(", ");
-        for (String field : fields) {
-            String name = field.split(" ")[1];
-            writer.println("      this." + name + " = " + name + ";");
+
+        // optional if the class has no fields (for break and continue)
+        if (!fieldList.equals("none")) {
+            // constructor
+            writer.println("    " + className + "(" + fieldList + ") {");
+
+            for (String field : fields) {
+                String name = field.split(" ")[1];
+                writer.println("      this." + name + " = " + name + ";");
+            }
+            writer.println("    }");
         }
-
-        writer.println("    }");
-
+        
         // define visitor pattern for each subclass
         writer.println();
         writer.println("    @Override");
@@ -91,13 +95,14 @@ public class GenerateAST {
         writer.println("      return visitor.visit" + className + baseName + "(this);");
         writer.println("    }");
 
-        
-        // fields
-        writer.println();
-        for (String field : fields) {
-            writer.println("    final " + field + ";");
+        // optional for break and continue
+        if (!fieldList.equals("none")) {
+            // fields
+            writer.println();
+            for (String field : fields) {
+                writer.println("    final " + field + ";");
+            }
         }
-
         writer.println("  }");
     }
 

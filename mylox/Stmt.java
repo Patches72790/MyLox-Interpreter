@@ -10,6 +10,8 @@ abstract class Stmt {
     R visitExpressionStmt(Expression stmt);
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
+    R visitBreakStmt(Break stmt);
+    R visitContinueStmt(Continue stmt);
   }
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
@@ -90,6 +92,20 @@ abstract class Stmt {
 
     final Token name;
     final Expr initializer;
+  }
+  static class Break extends Stmt {
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitBreakStmt(this);
+    }
+  }
+  static class Continue extends Stmt {
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitContinueStmt(this);
+    }
   }
 
   abstract <R> R accept(Visitor<R> visitor);

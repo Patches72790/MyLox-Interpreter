@@ -10,6 +10,8 @@ import mylox.Expr.Logical;
 import mylox.Expr.Unary;
 import mylox.Expr.Variable;
 import mylox.Stmt.Block;
+import mylox.Stmt.Break;
+import mylox.Stmt.Continue;
 import mylox.Stmt.Expression;
 import mylox.Stmt.If;
 import mylox.Stmt.Print;
@@ -187,6 +189,7 @@ public class Interpreter implements Expr.Visitor<Object>,
 
             // execute all statements in list
             for (Stmt statement : statements) {
+                // check for statement as instance of Break or Continue
                 execute(statement);
             }
         } finally {
@@ -402,6 +405,18 @@ public class Interpreter implements Expr.Visitor<Object>,
             execute(stmt.body);
         }
 
+        return null;
+    }
+
+    @Override
+    public Void visitBreakStmt(Break stmt) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Void visitContinueStmt(Continue stmt) {
+        // TODO Auto-generated method stub
         return null;
     }    
 }

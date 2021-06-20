@@ -1,1 +1,3 @@
 mylox/*.class
+.vscode/
+tests/*

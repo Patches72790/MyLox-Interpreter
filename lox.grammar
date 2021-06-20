@@ -19,6 +19,8 @@ statement      : exprStmt
                | printStmt
                | returnStmt
                | whileStmt
+               | breakStmt
+               | continueStmt
                | block ;
 
 exprStmt       : expression ";" ;
