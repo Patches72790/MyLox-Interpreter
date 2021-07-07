@@ -1,30 +1,28 @@
 package mylox;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import mylox.Expr.Assign;
 import mylox.Expr.Binary;
+import mylox.Expr.Call;
 import mylox.Expr.Grouping;
 import mylox.Expr.Literal;
 import mylox.Expr.Logical;
 import mylox.Expr.Unary;
 import mylox.Expr.Variable;
 import mylox.Stmt.Block;
-import mylox.Stmt.Break;
-import mylox.Stmt.Expression;
 import mylox.Stmt.If;
-import mylox.Stmt.Print;
 import mylox.Stmt.Var;
 import mylox.Stmt.While;
-import mylox.BreakException;
+
 /**
- * This class supports the interpreting of expressions 
- * built from the Parser abstract syntax trees of this lox language.
+ * This class supports the interpreting of expressions built from the Parser
+ * abstract syntax trees of this lox language.
  * 
  * @author Patrick
  */
-public class Interpreter implements Expr.Visitor<Object>,
-                                    Stmt.Visitor<Void> {
+public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     // interpreter has its global environment
     private Environment environment = new Environment();
@@ -42,19 +40,21 @@ public class Interpreter implements Expr.Visitor<Object>,
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         } catch (BreakException breakExcpt) {
+            // TODO -- not happy with this, but it works for now
+            // I would like this to be located in the parser rather than interpreter
             Lox.error(0, "Error found break exception outside of control flow.");
         }
     }
 
     /**
-     * This method returns the string representation of the evaluated
-     * expression.
+     * This method returns the string representation of the evaluated expression.
      * 
      * @param object the value of the expression that was evaluated
      * @return the stringified expression
      */
     private String stringify(Object object) {
-        if (object == null) return "nil";
+        if (object == null)
+            return "nil";
 
         // handles number printing
         if (object instanceof Double) {
@@ -71,10 +71,8 @@ public class Interpreter implements Expr.Visitor<Object>,
         return object.toString();
     }
 
-
     /**
-     * This method evaluates a binary expression and returns the resulting
-     * value.
+     * This method evaluates a binary expression and returns the resulting value.
      * 
      * @return the value of the evaluated expression
      */
@@ -111,11 +109,11 @@ public class Interpreter implements Expr.Visitor<Object>,
 
                 // otherwise throw error
                 throw new RuntimeError(expr.operator, "Operands must be two numbers or two strings.");
-            
+
             // mult and division
             case SLASH:
                 checkNumberOperands(expr.operator, left, right);
-                if ((double) right == 0) 
+                if ((double) right == 0)
                     throw new RuntimeError(expr.operator, "Division by zero.");
 
                 return (double) left / (double) right;
@@ -157,8 +155,8 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
 
     /**
-     * Fundamental method for evaluating expressions for the interpreter.
-     * This method calls the initial accept method on each expressions.
+     * Fundamental method for evaluating expressions for the interpreter. This
+     * method calls the initial accept method on each expressions.
      * 
      * @param expr the expression to be evaluated
      * @return the value of the expression evaluated
@@ -169,6 +167,7 @@ public class Interpreter implements Expr.Visitor<Object>,
 
     /**
      * Interprets recursively the stmt and its expressions.
+     * 
      * @param stmt
      */
     private void execute(Stmt stmt) {
@@ -196,11 +195,10 @@ public class Interpreter implements Expr.Visitor<Object>,
             // restore global environment to interpreter
             this.environment = previous;
         }
-    }   
+    }
 
     /**
-     * Converts literal expressions into its corresponding
-     * runtime value.
+     * Converts literal expressions into its corresponding runtime value.
      */
     @Override
     public Object visitLiteralExpr(Literal expr) {
@@ -208,8 +206,7 @@ public class Interpreter implements Expr.Visitor<Object>,
     }
 
     /**
-     * This method evalutes a unary expression and return the 
-     * object value.
+     * This method evalutes a unary expression and return the object value.
      * 
      * @return the object value of the unary expression
      */
@@ -227,25 +224,26 @@ public class Interpreter implements Expr.Visitor<Object>,
                 return -(double) right;
         }
 
-        // unreachable 
+        // unreachable
         return null;
     }
 
     /**
-     * Checks that the right hand operand of the unary expression is also a 
-     * Double. Otherwise, it throws a runtime error.
+     * Checks that the right hand operand of the unary expression is also a Double.
+     * Otherwise, it throws a runtime error.
      * 
      * @param operator the operator for the expression
-     * @param operand the right operand for the expression
+     * @param operand  the right operand for the expression
      */
     private void checkNumberOperand(Token operator, Object operand) {
-        if (operand instanceof Double) return;
+        if (operand instanceof Double)
+            return;
         throw new RuntimeError(operator, "Operand must be a number");
     }
 
     /**
-     * Checks that the left and right hand operands are valid Doubles,
-     * otherwise a runtime exception is thrown.
+     * Checks that the left and right hand operands are valid Doubles, otherwise a
+     * runtime exception is thrown.
      * 
      * @param operator
      * @param left
@@ -253,7 +251,8 @@ public class Interpreter implements Expr.Visitor<Object>,
      */
     private void checkNumberOperands(Token operator, Object left, Object right) {
         // checks that both left and right operands are numbers
-        if (left instanceof Double && right instanceof Double) return;
+        if (left instanceof Double && right instanceof Double)
+            return;
 
         // else throw runtime error
         throw new RuntimeError(operator, "Operands must be numbers.");
@@ -267,49 +266,51 @@ public class Interpreter implements Expr.Visitor<Object>,
      * @return whether a equals b based on builtin Object method from Java
      */
     private boolean isEqual(Object a, Object b) {
-        if (a == null && b == null) return true;
-        if (a == null) return false;
+        if (a == null && b == null)
+            return true;
+        if (a == null)
+            return false;
 
         // TODO could potentially add further equality measures
         // e.g. Do I want string equality checking?
-        //      Do I want more rigorous checking than the equals method?
+        // Do I want more rigorous checking than the equals method?
 
         return a.equals(b);
     }
 
     /**
-     * Determines whether the object is a truthy expression or not.
-     * Null objects and false booleans are falsey. All other
-     * expressions are truthy.
+     * Determines whether the object is a truthy expression or not. Null objects and
+     * false booleans are falsey. All other expressions are truthy.
      * 
      * @param object the expression to be checked for truthiness
      * @return the truthiness of the object
      */
     private boolean isTruthy(Object object) {
-        if (object == null) return false;
-        if (object instanceof Boolean) return (boolean) object;
+        if (object == null)
+            return false;
+        if (object instanceof Boolean)
+            return (boolean) object;
         // empty strings are false
         if (object instanceof String) {
             return ((String) object).length() != 0;
-//            if (((String)object).length() == 0) return false;
-//            else return true;
+            // if (((String)object).length() == 0) return false;
+            // else return true;
         }
         // number zero is false
         if (object instanceof Double) {
             return ((Double) object).doubleValue() != 0;
-//            if (((Double)object).doubleValue() == 0) return false;
-//            else return true;
+            // if (((Double)object).doubleValue() == 0) return false;
+            // else return true;
         }
         return true;
     }
-
 
     public Void visitExpressionStmt(Stmt.Expression stmt) {
         Object exprResult = evaluate(stmt.expression);
 
         // for evaluating simple expressions in interpreter
         if (exprResult != null) {
-           // System.out.println(exprResult);
+            // System.out.println(exprResult);
         }
 
         return null;
@@ -353,10 +354,8 @@ public class Interpreter implements Expr.Visitor<Object>,
         }
 
         // throw an error if identifier is not initialized to anything
-        throw new RuntimeError(expr.name, "Error: variable '"
-        + expr.name.lexeme + "' is not initialized.");
+        throw new RuntimeError(expr.name, "Error: variable '" + expr.name.lexeme + "' is not initialized.");
     }
-
 
     @Override
     public Object visitAssignExpr(Assign expr) {
@@ -391,10 +390,12 @@ public class Interpreter implements Expr.Visitor<Object>,
 
         // or can short circuit if left evaluates to true
         if (expr.operator.type == TokenType.OR) {
-            if (isTruthy(left)) return left;
+            if (isTruthy(left))
+                return left;
         } else {
             // and short circuits if false
-            if (!isTruthy(left)) return left;
+            if (!isTruthy(left))
+                return left;
         }
 
         return evaluate(expr.right);
@@ -416,5 +417,26 @@ public class Interpreter implements Expr.Visitor<Object>,
     @Override
     public Void visitBreakStmt(Stmt.Break stmt) {
         throw new BreakException(stmt);
+    }
+
+    @Override
+    public Object visitCallExpr(Call expr) {
+        Object callee = evaluate(expr.callee);
+
+        List<Object> arguments = new ArrayList<>();
+        for (Expr argument : expr.arguments) {
+            arguments.add(evaluate(argument));
+        }
+
+        if (!(callee instanceof LoxCallable)) {
+            throw new RuntimeError(expr.paren, "Can only call functions and classes.");
+        }
+
+        LoxCallable function = (LoxCallable) callee;
+
+        if (arguments.size() != function.arity()) {
+            throw new RuntimeError(expr.paren, "Expected " + function.arity() + " but got " + arguments.size() + ".");
+        }
+        return function.call(this, arguments);
     }
 }

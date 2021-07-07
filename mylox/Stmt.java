@@ -12,15 +12,6 @@ abstract class Stmt {
     R visitVarStmt(Var stmt);
     R visitBreakStmt(Break stmt);
   }
-
-  private boolean hadBreak = false;
-  boolean hadBreak() {
-    return hadBreak;
-  }
-  void setHadBreak() {
-    this.hadBreak = true;
-  }
-
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
       this.condition = condition;

@@ -18,6 +18,7 @@ public class GenerateAST {
 
         defineAst(outputDir, "Expr", Arrays.asList(
             "Binary   : Expr left, Token operator, Expr right",
+            "Call     : Expr callee, Token paren, List<Expr> arguments",
             "Grouping : Expr expression",
             "Literal  : Object value",
             "Logical  : Expr left, Token operator, Expr right",
@@ -35,10 +36,7 @@ public class GenerateAST {
             "Print      : Expr expression",
             "Var        : Token name, Expr initializer",
             "Break      : Token breakToken"
-        ),
-        Arrays.asList(
-            "hadBreak"
-        ));
+        ), null);
     }
 
     private static void defineAst(String outputDir, String baseName, List<String> types, List<String> optionalSharedFields) throws IOException {
