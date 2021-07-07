@@ -25,7 +25,25 @@ import mylox.Stmt.While;
 public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
     // interpreter has its global environment
-    private Environment environment = new Environment();
+    final Environment globals = new Environment();
+    private Environment environment = globals;
+
+    Interpreter() {
+        // define global function for use
+        globals.define("clock", new LoxCallable() {
+            public int arity() {
+                return 0;
+            }
+
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                return (double) System.currentTimeMillis() / 1000.0;
+            }
+
+            public String toString() {
+                return "<native fn>";
+            }
+        });
+    }
 
     /**
      * Interface method for interpreting statement lists.
