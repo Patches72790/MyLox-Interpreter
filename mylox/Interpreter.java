@@ -12,6 +12,7 @@ import mylox.Expr.Logical;
 import mylox.Expr.Unary;
 import mylox.Expr.Variable;
 import mylox.Stmt.Block;
+import mylox.Stmt.Function;
 import mylox.Stmt.If;
 import mylox.Stmt.Var;
 import mylox.Stmt.While;
@@ -29,7 +30,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     private Environment environment = globals;
 
     Interpreter() {
-        // define global function for use
+        // define global function for use in interpreter
         globals.define("clock", new LoxCallable() {
             public int arity() {
                 return 0;
@@ -456,5 +457,13 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
             throw new RuntimeError(expr.paren, "Expected " + function.arity() + " but got " + arguments.size() + ".");
         }
         return function.call(this, arguments);
+    }
+
+    @Override
+    public Void visitFunctionStmt(Function stmt) {
+        // create the function object and bind it to the function stmts identifier
+        LoxFunction function = new LoxFunction(stmt);
+        environment.define(stmt.name.lexeme, function);
+        return null;
     }
 }

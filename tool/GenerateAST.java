@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class GenerateAST {
-    
+
     public static void main(String[] args) throws IOException {
 
         if (args.length != 1) {
@@ -16,30 +16,23 @@ public class GenerateAST {
 
         String outputDir = args[0];
 
-        defineAst(outputDir, "Expr", Arrays.asList(
-            "Binary   : Expr left, Token operator, Expr right",
-            "Call     : Expr callee, Token paren, List<Expr> arguments",
-            "Grouping : Expr expression",
-            "Literal  : Object value",
-            "Logical  : Expr left, Token operator, Expr right",
-            "Unary    : Token operator, Expr right",
-            "Variable : Token name",
-            "Assign   : Token name, Expr value"
-        ), null);
+        defineAst(outputDir, "Expr", Arrays.asList("Binary   : Expr left, Token operator, Expr right",
+                "Call     : Expr callee, Token paren, List<Expr> arguments", "Grouping : Expr expression",
+                "Literal  : Object value", "Logical  : Expr left, Token operator, Expr right",
+                "Unary    : Token operator, Expr right", "Variable : Token name", "Assign   : Token name, Expr value"),
+                null);
 
-        defineAst(outputDir, "Stmt", Arrays.asList(
-            "If         : Expr condition, Stmt thenBranch," +
-                        " Stmt elseBranch",
-            "Block      : List<Stmt> statements",
-            "While      : Expr condition, Stmt body",
-            "Expression : Expr expression",
-            "Print      : Expr expression",
-            "Var        : Token name, Expr initializer",
-            "Break      : Token breakToken"
-        ), null);
+        defineAst(outputDir, "Stmt",
+                Arrays.asList("If         : Expr condition, Stmt thenBranch," + " Stmt elseBranch",
+                        "Block      : List<Stmt> statements", "While      : Expr condition, Stmt body",
+                        "Expression : Expr expression", "Function   : Token name, List<Token> params, List<Stmt> body",
+                        "Print      : Expr expression", "Var        : Token name, Expr initializer",
+                        "Break      : Token breakToken"),
+                null);
     }
 
-    private static void defineAst(String outputDir, String baseName, List<String> types, List<String> optionalSharedFields) throws IOException {
+    private static void defineAst(String outputDir, String baseName, List<String> types,
+            List<String> optionalSharedFields) throws IOException {
 
         String path = outputDir + "/" + baseName + ".java";
         PrintWriter writer = new PrintWriter(path, "UTF-8");
@@ -69,7 +62,6 @@ public class GenerateAST {
         writer.println();
         writer.println("  abstract <R> R accept(Visitor<R> visitor);");
 
-
         writer.println("}");
         writer.close();
     }
@@ -92,7 +84,7 @@ public class GenerateAST {
             }
             writer.println("    }");
         }
-        
+
         // define visitor pattern for each subclass
         writer.println();
         writer.println("    @Override");
@@ -117,8 +109,7 @@ public class GenerateAST {
 
         for (String type : types) {
             String typeName = type.split(":")[0].trim();
-            writer.println("    R visit" + typeName + baseName + "("
-            + typeName + " " + baseName.toLowerCase() + ");");
+            writer.println("    R visit" + typeName + baseName + "(" + typeName + " " + baseName.toLowerCase() + ");");
         }
 
         writer.println("  }");
@@ -137,4 +128,3 @@ public class GenerateAST {
         writer.println();
     }
 }
-
