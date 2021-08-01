@@ -27,7 +27,7 @@ public class GenerateAST {
                         "Block      : List<Stmt> statements", "While      : Expr condition, Stmt body",
                         "Expression : Expr expression", "Function   : Token name, List<Token> params, List<Stmt> body",
                         "Print      : Expr expression", "Var        : Token name, Expr initializer",
-                        "Break      : Token breakToken"),
+                        "Break      : Token breakToken", "Return     : Token keyword, Expr value"),
                 null);
     }
 

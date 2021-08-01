@@ -222,6 +222,8 @@ public class Parser {
             return ifStatement();
         if (match(PRINT))
             return printStatement();
+        if (match(RETURN))
+            return returnStatement();
         if (match(WHILE))
             return whileStatement();
         if (match(BREAK))
@@ -235,6 +237,18 @@ public class Parser {
     private Stmt breakStatement() {
         consume(SEMICOLON, "Expect ';' after break.");
         return new Stmt.Break(new Token(BREAK, "break", null, current));
+    }
+
+    private Stmt returnStatement() {
+        Token keyword = previous();
+        Expr value = null;
+
+        if (!check(SEMICOLON)) {
+            value = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after return value.");
+        return new Stmt.Return(keyword, value);
     }
 
     private Stmt forStatement() {

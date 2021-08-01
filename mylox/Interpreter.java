@@ -14,6 +14,7 @@ import mylox.Expr.Variable;
 import mylox.Stmt.Block;
 import mylox.Stmt.Function;
 import mylox.Stmt.If;
+import mylox.Stmt.Return;
 import mylox.Stmt.Var;
 import mylox.Stmt.While;
 
@@ -462,8 +463,19 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     @Override
     public Void visitFunctionStmt(Function stmt) {
         // create the function object and bind it to the function stmts identifier
-        LoxFunction function = new LoxFunction(stmt);
+        // pass in the current environment of interpter to function stmt declaration for
+        // closure
+        LoxFunction function = new LoxFunction(stmt, environment);
         environment.define(stmt.name.lexeme, function);
         return null;
+    }
+
+    @Override
+    public Void visitReturnStmt(Stmt.Return stmt) {
+        Object value = null;
+        if (stmt.value != null)
+            value = evaluate(stmt.value);
+
+        throw new mylox.Return(value);
     }
 }

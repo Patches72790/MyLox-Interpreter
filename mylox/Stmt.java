@@ -12,6 +12,7 @@ abstract class Stmt {
     R visitPrintStmt(Print stmt);
     R visitVarStmt(Var stmt);
     R visitBreakStmt(Break stmt);
+    R visitReturnStmt(Return stmt);
   }
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
@@ -120,6 +121,20 @@ abstract class Stmt {
     }
 
     final Token breakToken;
+  }
+  static class Return extends Stmt {
+    Return(Token keyword, Expr value) {
+      this.keyword = keyword;
+      this.value = value;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitReturnStmt(this);
+    }
+
+    final Token keyword;
+    final Expr value;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
