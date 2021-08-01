@@ -3,7 +3,10 @@ package mylox;
 import java.util.List;
 
 public class LoxFunction implements LoxCallable {
+    // declaration stores the function statements to be executed
     private final Stmt.Function declaration;
+    // closure stores any enclosing scope of outer functions or global scope by
+    // default
     private final Environment closure;
 
     LoxFunction(Stmt.Function declaration, Environment closure) {

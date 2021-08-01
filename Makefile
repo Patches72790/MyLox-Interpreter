@@ -2,7 +2,7 @@ run: build
 	@java mylox/Lox
 
 test: build
-	@java mylox/Lox tests/closuretest.jlox
+	@java mylox/Lox tests/outtest.jlox
 
 build: build-ast
 	@javac mylox/*.java

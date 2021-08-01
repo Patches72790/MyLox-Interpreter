@@ -45,6 +45,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
                 return "<native fn>";
             }
         });
+
+        globals.define("out", new LoxCallable() {
+            public int arity() {
+                return 1;
+            }
+
+            public Object call(Interpreter interpreter, List<Object> arguments) {
+                System.out.println(arguments.get(0));
+                return null;
+            }
+
+            public String toString() {
+                return "<native fn>";
+            }
+        });
     }
 
     /**
