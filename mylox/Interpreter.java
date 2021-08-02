@@ -75,9 +75,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         } catch (RuntimeError error) {
             Lox.runtimeError(error);
         } catch (BreakException breakExcpt) {
-            // TODO -- not happy with this, but it works for now
-            // I would like this to be located in the parser rather than interpreter
-            Lox.error(0, "Error found break exception outside of control flow.");
+            Lox.error(breakExcpt.getMyBreak().breakToken.line, "Error found break exception outside of control flow.");
         }
     }
 

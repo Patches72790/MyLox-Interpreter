@@ -235,8 +235,9 @@ public class Parser {
     }
 
     private Stmt breakStatement() {
+        Token breakToken = previous();
         consume(SEMICOLON, "Expect ';' after break.");
-        return new Stmt.Break(new Token(BREAK, "break", null, current));
+        return new Stmt.Break(breakToken);
     }
 
     private Stmt returnStatement() {
