@@ -111,6 +111,16 @@ public class Parser {
         return peek().type == type; // doesn't consume the token, but looksahead
     }
 
+    private boolean checkLookaheadOne(TokenType type) {
+        if (isAtEnd())
+            return false;
+        return peekNext().type == type;
+    }
+
+    private Token peekNext() {
+        return tokens.get(current + 1);
+    }
+
     /**
      * Consume the current token and return it. Otherwise, return the previous
      * token.
@@ -184,8 +194,16 @@ public class Parser {
 
     private Stmt declaration() {
         try {
-            if (match(FUN))
-                return function("function");
+            if (check(FUN))
+                // HACK -- VERY hacky way of checking for function expression statements
+                // that needs to lookahead to current + 1 without consuming FUN token
+                if (checkLookaheadOne(LEFT_PAREN)) {
+                    return expressionStatement();
+                }
+                else {
+                    match(FUN);
+                    return function("function");
+                }
             if (match(VAR))
                 return varDeclaration();
 
@@ -418,20 +436,9 @@ public class Parser {
             // if lhs was a variable (i.e. L-value)
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable) expr).name;
-
                 /*
-                 * TODO -- parsing for ternary operator // parsing for ternary operation if
-                 * (match(QUESTION)) { Expr first = equality(); Expr second;
-                 * 
-                 * if (match(COLON)) { second = equality();
-                 * 
-                 * // just going to always return first until // assignment and evaluation are
-                 * implemented
-                 * 
-                 * // todo -- fix the correct assignment rule for ternary op } else { throw
-                 * error(peek(), "Expected colon for ternary expression."); } }
-                 */
-
+                 * TODO -- parsing for ternary operator 
+                */
                 return new Expr.Assign(name, value);
             }
 

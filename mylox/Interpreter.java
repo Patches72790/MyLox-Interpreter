@@ -363,6 +363,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     public Void visitVarStmt(Var stmt) {
         Object value = null;
         if (stmt.initializer != null) {
+            // handle case for anonymous functions
             value = evaluate(stmt.initializer);
         }
 
@@ -493,9 +494,12 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
-    public Void visitAnonFunctionExpr(Expr.AnonFunction expr) {
-            
-
-        return null;
+    public LoxAnonFunction visitAnonFunctionExpr(Expr.AnonFunction expr) {
+        if (expr == null) {
+            return null;
+        }
+        // return a new Lox Anonymous Function object containing environment
+        // and the params and body of function
+        return new LoxAnonFunction(expr, environment);
     }
 }

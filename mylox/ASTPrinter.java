@@ -89,4 +89,9 @@ public class ASTPrinter implements Expr.Visitor<String> {
         // TODO Auto-generated method stub
         return null;
     }
+
+    @Override
+    public String visitAnonFunctionExpr(Expr.AnonFunction expr) {
+        return null;
+    }
 }
