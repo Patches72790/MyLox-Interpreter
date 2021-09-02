@@ -491,4 +491,11 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
 
         throw new mylox.Return(value);
     }
+
+    @Override
+    public Void visitAnonFunctionExpr(Expr.AnonFunction expr) {
+            
+
+        return null;
+    }
 }

@@ -2,8 +2,8 @@ run: build
 	@java mylox/Lox
 
 test: build
-	@java mylox/Lox tests/decltest.jlox
-
+	@java mylox/Lox tests/anonFuncTest.lox
+	
 build: build-ast
 	@javac mylox/*.java
 

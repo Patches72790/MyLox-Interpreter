@@ -353,6 +353,7 @@ public class Parser {
     }
 
     private Stmt.Function function(String kind) {
+        // leave name null for anonymous functions
         Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
 
         // parse function parameters
@@ -372,6 +373,26 @@ public class Parser {
         consume(LEFT_BRACE, "Expect '{' before + " + kind + " body.");
         List<Stmt> body = block();
         return new Stmt.Function(name, parameters, body);
+    }
+
+    private Expr.AnonFunction functionExpression() {
+        // parse function parameters
+        consume(LEFT_PAREN, "Expect '(' after anonymous function declarator.");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 255) {
+                    error(peek(), "Can't have more than 255 parameters.");
+                }
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+        // parse function body
+        consume(LEFT_BRACE, "Expect '{' before anonymous function body.");
+        List<Stmt> body = block();
+        return new Expr.AnonFunction(parameters, body);
     }
 
     /////////////////////////////////////////////////
@@ -549,6 +570,10 @@ public class Parser {
         // parse literals
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(FUN)) {
+            return functionExpression();
         }
 
         // parse identifier

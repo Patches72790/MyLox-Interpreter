@@ -12,6 +12,7 @@ abstract class Expr {
     R visitUnaryExpr(Unary expr);
     R visitVariableExpr(Variable expr);
     R visitAssignExpr(Assign expr);
+    R visitAnonFunctionExpr(AnonFunction expr);
   }
   static class Binary extends Expr {
     Binary(Expr left, Token operator, Expr right) {
@@ -124,6 +125,20 @@ abstract class Expr {
 
     final Token name;
     final Expr value;
+  }
+  static class AnonFunction extends Expr {
+    AnonFunction(List<Token> params, List<Stmt> body) {
+      this.params = params;
+      this.body = body;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitAnonFunctionExpr(this);
+    }
+
+    final List<Token> params;
+    final List<Stmt> body;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
