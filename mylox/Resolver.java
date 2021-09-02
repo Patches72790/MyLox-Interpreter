@@ -20,9 +20,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
     }
 
-    // dispatch method for Resolver to visit AST nodes
+    // double dispatch method for Resolver to visit AST nodes
     private void resolve(Stmt stmt) {
         stmt.accept(this);
+    }
+
+    private void resolve(Expr expr) {
+        expr.accept(this);
     }
 
     /**
@@ -40,6 +44,31 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         scopes.pop();
     }
 
+    // variable is declared but not ready for use yet
+    private void declare(Token name) {
+        if (scopes.isEmpty()) return;
+
+        Map<String, Boolean> scope = scopes.peek();
+        scope.put(name.lexeme, false); // create scope and put name there
+                                        // declared but not used yet
+    }
+
+    // variable exists and is now available for use
+    private void define(Token name) {
+        if (scopes.isEmpty()) return;
+        scopes.peek().put(name.lexeme, true);
+    }
+
+    private void resolveLocal(Expr expr, Token name) {
+        for (int i = scopes.size(); i >= 0; i--) {
+            if (scopes.get(i).containsKey(name.lexeme)) {
+                // start at innermost scope and work outwards
+                // to resolve local variables
+                interpreter.resolve(expr, scopes.size() - 1 - i);
+            }
+        }
+    }
+
     @Override
     public Void visitBlockStmt(Stmt.Block stmt) {
         beginScope();
@@ -50,6 +79,21 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
+        declare(stmt.name);
+        if (stmt.initializer != null) {
+            resolve(stmt.initializer);
+        }
+        define(stmt.name);
         return null; 
+    }
+
+    @Override
+    public Void visitVariableExpr(Expr.Variable expr) {
+        if (!scopes.empty() && scopes.peek().get(expr.name.lexeme) == Boolean.FALSE) {
+            Lox.error(expr.name, "Can't read local variable in its own initializer.");
+        }
+
+        resolveLocal(expr, expr.name);
+        return null;
     }
 }

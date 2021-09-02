@@ -79,6 +79,10 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
     }
 
+    void resolve(Expr expr, int num) {
+        //TODO -- add resolve method for interpreter
+    }
+
     /**
      * This method returns the string representation of the evaluated expression.
      * 
