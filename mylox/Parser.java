@@ -300,6 +300,10 @@ public class Parser {
         // parse for body
         Stmt body = statement();
 
+        // TODO -- need to re-implement the FOR statement
+        // for interpreter because currently this introduces
+        // an extra BLOCK AST node that breaks the resolver
+        
         // the increment is executed as final statement of block
         if (increment != null) {
             body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
