@@ -94,6 +94,11 @@ public class Lox {
         // if (parserDebug)
         //     System.out.println(new ASTPrinter().print(statements));
 
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+
+        if (hadError) return;
+
         // print interpreted expression
         interpreter.interpret(statements);
     }

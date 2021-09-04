@@ -1,6 +1,8 @@
 package mylox;
 
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.List;
 
 import mylox.Expr.Assign;
@@ -29,6 +31,7 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     // interpreter has its global environment
     final Environment globals = new Environment();
     private Environment environment = globals;
+    private Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter() {
         // define global function for use in interpreter
@@ -79,8 +82,8 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
         }
     }
 
-    void resolve(Expr expr, int num) {
-        //TODO -- add resolve method for interpreter
+    void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
     }
 
     /**
@@ -383,22 +386,29 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
      */
     @Override
     public Object visitVariableExpr(Variable expr) {
-        // lookup id in environment
-        Object valueAtVarId = environment.get(expr.name);
+        // use locals for lookup instead of environment
+        return lookupVariable(expr.name, expr);
+    }
 
-        // return value if initialized / contains data
-        if (valueAtVarId != null) {
-            return valueAtVarId;
+    private Object lookupVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            return environment.getAt(distance, name.lexeme);
+        } else {
+            return globals.get(name);
         }
-
-        // throw an error if identifier is not initialized to anything
-        throw new RuntimeError(expr.name, "Error: variable '" + expr.name.lexeme + "' is not initialized.");
     }
 
     @Override
     public Object visitAssignExpr(Assign expr) {
         Object value = evaluate(expr.value);
-        environment.assign(expr.name, value);
+        //environment.assign(expr.name, value);
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            environment.assignAt(distance, expr.name, value);
+        } else {
+            globals.assign(expr.name, value);
+        }
         return value;
     }
 

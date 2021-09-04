@@ -23,6 +23,21 @@ public class Environment {
         values.put(name, value);
     }
 
+    Object getAt(int distance, String name) {
+        // just grab the values HashMap from the environment
+        return ancestor(distance).values.get(name);
+    }
+
+    Environment ancestor(int distance) {
+        // iterate through environments until the correct distance
+        // is reached
+        Environment environment = this;
+        for (int i = 0; i < distance; i++) {
+            environment = environment.enclosing;
+        }
+        return environment;
+    }
+
     Object get(Token name) {
         // look in current local scope first
         if (values.containsKey(name.lexeme)) {
@@ -50,5 +65,11 @@ public class Environment {
         }
 
         throw new RuntimeError(name, "Undefined variable '" + name.lexeme + "'.");
+    }
+
+    // assign at the specific distance within the environment
+    // chain the value associated with the name
+    void assignAt(int distance, Token name, Object value) {
+        ancestor(distance).values.put(name.lexeme, value);
     }
 }
