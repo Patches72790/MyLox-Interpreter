@@ -4,24 +4,16 @@
     var testAnonFun = fun () {
         var a = "stuff";
 
-        {
+        for (var i = 0; i < 3; i = i + 1) {
             var a = "other stuff";
-            {
-                print a;
-            }
-        }
-
-        fun myFun() {
-            a = "second";
-            var a = "another";
             print a;
         }
 
-        myFun();
         print a;
     };
-
+    print a;
     testAnonFun();
+    print a;
 }
 
 {
