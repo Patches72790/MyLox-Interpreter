@@ -62,8 +62,8 @@ unary          : ( "!" | "-" ) unary | call ;
 call           : primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 primary        : "true" | "false" | "nil" | "this"
                | NUMBER | STRING | IDENTIFIER | "(" expression ")"
-               | "super" "." IDENTIFIER ;
-
+               | "super" "." IDENTIFIER
+               | functionExpression ;
 
 
 

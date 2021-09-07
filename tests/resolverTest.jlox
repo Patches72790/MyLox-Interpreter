@@ -1,0 +1,42 @@
+var a = "things";
+
+fun testAnonFun() {
+    var a = "stuff";
+    var i = 0;
+    while (i < 3) {
+        var a = "stupid";
+        //print a;
+        i = i + 1;
+    }
+
+    fun myFun() {
+        var b = "another";
+        print b;
+    }
+
+    myFun();
+    print a;
+}
+
+testAnonFun();
+
+var c = "global";
+
+{
+    fun showC() {
+        print c;
+    }
+
+    showC();
+    var c = "block";
+    showC();
+}
+
+
+//fun bad() {
+//    var a = "first";
+//    var a = "second";
+//    print a;
+//}
+//
+//bad();

@@ -298,7 +298,15 @@ public class Parser {
         consume(RIGHT_PAREN, "Expect ')' after for clauses.");
 
         // parse for body
-        Stmt body = statement();
+        Stmt block = statement();
+        List<Stmt> body = new ArrayList<>();
+        Stmt.For forNode = null;
+        Stmt finalBody = null;
+        if (block instanceof Stmt.Block) {
+            body = ((Stmt.Block) block).statements;
+        } else {
+            body.add(block);
+        }
 
         // TODO -- need to re-implement the FOR statement
         // for interpreter because currently this introduces
@@ -306,21 +314,21 @@ public class Parser {
         
         // the increment is executed as final statement of block
         if (increment != null) {
-            body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
+            body.add(new Stmt.Expression(increment));
         }
 
         // wrap the body in a while loop with condition expression
         if (condition == null)
             condition = new Expr.Literal(true);
-        body = new Stmt.While(condition, body);
+        forNode = new Stmt.For(initializer, condition, increment, body);
 
         // the initializer if present wraps the while loop since
         // it is executed once at the beginning of the loop
         if (initializer != null) {
-            body = new Stmt.Block(Arrays.asList(initializer, body));
+            finalBody = new Stmt.Block(Arrays.asList(initializer, forNode));
         }
 
-        return body;
+        return finalBody;
     }
 
     private Stmt ifStatement() {

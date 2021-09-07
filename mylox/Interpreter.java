@@ -463,6 +463,21 @@ public class Interpreter implements Expr.Visitor<Object>, Stmt.Visitor<Void> {
     }
 
     @Override
+    public Void visitForStmt(Stmt.For stmt) {
+        while (isTruthy(evaluate(stmt.condition))) {
+            try {
+                for (Stmt thisStmt : stmt.body) {
+                    execute(thisStmt);
+                }
+            } catch (BreakException be) {
+                break;
+            }
+     
+        }
+        return null;
+    }
+
+    @Override
     public Void visitBreakStmt(Stmt.Break stmt) {
         throw new BreakException(stmt);
     }

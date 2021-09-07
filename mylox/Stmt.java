@@ -13,6 +13,7 @@ abstract class Stmt {
     R visitVarStmt(Var stmt);
     R visitBreakStmt(Break stmt);
     R visitReturnStmt(Return stmt);
+    R visitForStmt(For stmt);
   }
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
@@ -135,6 +136,24 @@ abstract class Stmt {
 
     final Token keyword;
     final Expr value;
+  }
+  static class For extends Stmt {
+    For(Stmt initializer, Expr condition, Expr increment, List<Stmt> body) {
+      this.initializer = initializer;
+      this.condition = condition;
+      this.increment = increment;
+      this.body = body;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitForStmt(this);
+    }
+
+    final Stmt initializer;
+    final Expr condition;
+    final Expr increment;
+    final List<Stmt> body;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
