@@ -1,42 +1,39 @@
-var a = "things";
+{
+    var a = "things";
 
-fun testAnonFun() {
-    var a = "stuff";
-    var i = 0;
-    while (i < 3) {
-        var a = "stupid";
-        //print a;
-        i = i + 1;
-    }
+    var testAnonFun = fun () {
+        var a = "stuff";
 
-    fun myFun() {
-        var b = "another";
-        print b;
-    }
+        {
+            var a = "other stuff";
+            {
+                print a;
+            }
+        }
 
-    myFun();
-    print a;
+        fun myFun() {
+            a = "second";
+            var a = "another";
+            print a;
+        }
+
+        myFun();
+        print a;
+    };
+
+    testAnonFun();
 }
-
-testAnonFun();
-
-var c = "global";
 
 {
-    fun showC() {
-        print c;
-    }
+    var c = "global";
+    {
+        fun showC() {
+            print c;
+        }
 
-    showC();
-    var c = "block";
-    showC();
+        showC();
+        var c = "block";
+        showC();
+    }
 }
 
-
-//fun bad() {
-//    var a = "first";
-//    var a = "second";
-//    print a;
-//}
-//
-//bad();

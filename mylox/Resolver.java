@@ -75,6 +75,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
                 // start at innermost scope and work outwards
                 // to resolve local variables
                 interpreter.resolve(expr, scopes.size() - 1 - i);
+                return;
             }
         }
     }
