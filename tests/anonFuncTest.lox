@@ -1,0 +1,27 @@
+
+fun thrice(fn) {
+    for (var i = 0; i < 3; i = i + 1) {
+        fn(i);
+    }
+}
+
+thrice(fun(a) {
+    print a;
+});
+
+fun () {};
+
+fun factory() {
+    var count = 0;
+
+    return fun() {
+        print count;
+        count = count + 1;
+    };
+}
+
+var myF = factory();
+myF();
+myF();
+myF();
+
