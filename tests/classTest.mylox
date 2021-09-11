@@ -1,0 +1,20 @@
+
+class Bagel {}
+
+var bagel = Bagel();
+print bagel;
+
+fun anotherMethod() {
+    print "another method";
+}
+
+bagel.creamCheeseType = "Cinnamon";
+bagel.sayHello = fun() { print "hello"; };
+print bagel.creamCheeseType;
+bagel.sayHello();
+
+var copy = bagel.sayHello;
+copy();
+
+bagel.function = anotherMethod;
+bagel.function();
