@@ -20,7 +20,8 @@ public class GenerateAST {
                 "Call     : Expr callee, Token paren, List<Expr> arguments", "Grouping : Expr expression",
                 "Literal  : Object value", "Logical  : Expr left, Token operator, Expr right",
                 "Unary    : Token operator, Expr right", "Variable : Token name", "Assign   : Token name, Expr value",
-                "AnonFunction : List<Token> params, List<Stmt> body"),
+                "AnonFunction : List<Token> params, List<Stmt> body",
+                "Get      : Expr object, Token name", "Set    : Expr object, Token name, Expr value"),
                 null);
 
         defineAst(outputDir, "Stmt",
@@ -29,7 +30,8 @@ public class GenerateAST {
                         "Expression : Expr expression", "Function   : Token name, List<Token> params, List<Stmt> body",
                         "Print      : Expr expression", "Var        : Token name, Expr initializer",
                         "Break      : Token breakToken", "Return     : Token keyword, Expr value", 
-                        "For        : Stmt initializer, Expr condition, Expr increment, List<Stmt> body"),
+                        "For        : Stmt initializer, Expr condition, Expr increment, List<Stmt> body",
+                        "Class      : Token name, List<Stmt.Function> methods"),
                 null);
     }
 

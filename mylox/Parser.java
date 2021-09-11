@@ -194,6 +194,7 @@ public class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(CLASS)) return classDeclaration();
             if (check(FUN))
                 // HACK -- VERY hacky way of checking for function expression statements
                 // that needs to lookahead to current + 1 without consuming FUN token
@@ -212,6 +213,19 @@ public class Parser {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt classDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        consume(LEFT_BRACE, "Expect '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(function("method"));
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+        return new Stmt.Class(name, methods);
     }
 
     private Stmt varDeclaration() {
@@ -452,6 +466,9 @@ public class Parser {
                  * TODO -- parsing for ternary operator 
                 */
                 return new Expr.Assign(name, value);
+            } else if (expr instanceof Expr.Get) {
+                Expr.Get get = (Expr.Get) expr;
+                return new Expr.Set(get.object, get.name, value);
             }
 
             // if something other than variable used as L-value
@@ -552,6 +569,9 @@ public class Parser {
         while (true) {
             if (match(LEFT_PAREN)) {
                 expr = finishCall(expr);
+            } else if (match(DOT)) {
+                Token name = consume(IDENTIFIER, "Expect property name after '.'");
+                expr = new Expr.Get(expr, name);
             } else {
                 break;
             }

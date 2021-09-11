@@ -16,7 +16,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     private enum FunctionType {
         NONE,
-        FUNCTION
+        FUNCTION,
+        METHOD
     }
 
     // Wrapping method for visiting AST nodes as Resolver
@@ -80,6 +81,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
     }
 
+
     private void resolveFunction(Stmt.Function function, FunctionType type) {
         // save current function type during resolution
         FunctionType enclosingFunction = currentFunction;
@@ -111,6 +113,31 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         endScope();
 
         currentFunction = enclosingFunction;
+    }
+
+    @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        declare(stmt.name);
+        define(stmt.name);
+
+        for (Stmt.Function method : stmt.methods) {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(method, declaration);
+        }
+        return null;
+    }
+
+    @Override
+    public Void visitGetExpr(Expr.Get expr) {
+        resolve(expr.object);
+        return null;
+    }
+
+    @Override
+    public Void visitSetExpr(Expr.Set expr) {
+        resolve(expr.value);
+        resolve(expr.object);
+        return null;
     }
 
     @Override

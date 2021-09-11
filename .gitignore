@@ -1,3 +1,4 @@
 mylox/*.class
 .vscode/
 tool/*.class
+.vimspector.json

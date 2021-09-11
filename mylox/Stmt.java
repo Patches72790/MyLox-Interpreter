@@ -14,6 +14,7 @@ abstract class Stmt {
     R visitBreakStmt(Break stmt);
     R visitReturnStmt(Return stmt);
     R visitForStmt(For stmt);
+    R visitClassStmt(Class stmt);
   }
   static class If extends Stmt {
     If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
@@ -154,6 +155,20 @@ abstract class Stmt {
     final Expr condition;
     final Expr increment;
     final List<Stmt> body;
+  }
+  static class Class extends Stmt {
+    Class(Token name, List<Stmt.Function> methods) {
+      this.name = name;
+      this.methods = methods;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitClassStmt(this);
+    }
+
+    final Token name;
+    final List<Stmt.Function> methods;
   }
 
   abstract <R> R accept(Visitor<R> visitor);

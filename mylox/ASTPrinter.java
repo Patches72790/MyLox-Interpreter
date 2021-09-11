@@ -94,4 +94,14 @@ public class ASTPrinter implements Expr.Visitor<String> {
     public String visitAnonFunctionExpr(Expr.AnonFunction expr) {
         return null;
     }
+
+    @Override
+    public String visitGetExpr(Expr.Get expr) {
+        return null;
+    }
+
+    @Override
+    public String visitSetExpr(Expr.Set expr) {
+        return null;
+    }
 }

@@ -13,6 +13,8 @@ abstract class Expr {
     R visitVariableExpr(Variable expr);
     R visitAssignExpr(Assign expr);
     R visitAnonFunctionExpr(AnonFunction expr);
+    R visitGetExpr(Get expr);
+    R visitSetExpr(Set expr);
   }
   static class Binary extends Expr {
     Binary(Expr left, Token operator, Expr right) {
@@ -139,6 +141,36 @@ abstract class Expr {
 
     final List<Token> params;
     final List<Stmt> body;
+  }
+  static class Get extends Expr {
+    Get(Expr object, Token name) {
+      this.object = object;
+      this.name = name;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitGetExpr(this);
+    }
+
+    final Expr object;
+    final Token name;
+  }
+  static class Set extends Expr {
+    Set(Expr object, Token name, Expr value) {
+      this.object = object;
+      this.name = name;
+      this.value = value;
+    }
+
+    @Override
+    <R> R accept(Visitor<R> visitor) {
+      return visitor.visitSetExpr(this);
+    }
+
+    final Expr object;
+    final Token name;
+    final Expr value;
   }
 
   abstract <R> R accept(Visitor<R> visitor);
