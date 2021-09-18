@@ -5,7 +5,7 @@ class Cake {
     }
 }
 
-ass Thing {
+class Thing {
     getInnerClass() {
         class InnerClass {
             innerClassPrint() {
@@ -53,3 +53,4 @@ print Math.cube(3);
 
 var mathInstance = Math();
 print mathInstance.double(2);
+
