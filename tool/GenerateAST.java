@@ -21,7 +21,8 @@ public class GenerateAST {
                 "Literal  : Object value", "Logical  : Expr left, Token operator, Expr right",
                 "Unary    : Token operator, Expr right", "Variable : Token name", "Assign   : Token name, Expr value",
                 "AnonFunction : List<Token> params, List<Stmt> body",
-                "Get      : Expr object, Token name", "Set    : Expr object, Token name, Expr value"),
+                "Get      : Expr object, Token name", "Set    : Expr object, Token name, Expr value",
+                "This     : Token keyword"),
                 null);
 
         defineAst(outputDir, "Stmt",
