@@ -130,6 +130,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         declare(stmt.name);
         define(stmt.name);
 
+        // resolve static methods outside of this
+        for (Stmt.Function staticMethod : stmt.staticMethods) {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(staticMethod, declaration);
+        }
+
         beginScope();
         scopes.peek().put("this", true); // this is inserted as variable into all classes in implicit scope
 

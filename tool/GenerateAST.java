@@ -32,7 +32,7 @@ public class GenerateAST {
                         "Print      : Expr expression", "Var        : Token name, Expr initializer",
                         "Break      : Token breakToken", "Return     : Token keyword, Expr value", 
                         "For        : Stmt initializer, Expr condition, Expr increment, List<Stmt> body",
-                        "Class      : Token name, List<Stmt.Function> methods"),
+                        "Class      : Token name, List<Stmt.Function> methods, List<Stmt.Function> staticMethods"),
                 null);
     }
 
