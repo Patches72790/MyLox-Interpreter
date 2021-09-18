@@ -22,7 +22,35 @@ class Thing {
 
         return localFunction;
     }
+
+    class DoTheStaticThing() {
+        print "I'm a static method";
+    }
 }
 
-var inner = Thing().getInnerClass()();
-inner.innerClassPrint();
+print Thing().getInnerClass()();
+//Thing.WontWork();
+
+var boundStaticMethod = Thing.DoTheStaticThing;
+boundStaticMethod();
+
+class Math {
+    class square(n) {
+        return n * n;
+    }
+
+    class cube(n) {
+        return n * n * n;
+    }
+
+    double(n) {
+        return n + n;
+    }
+}
+
+print Math.square(3);
+print Math.cube(3);
+
+var mathInstance = Math();
+print mathInstance.double(2);
+

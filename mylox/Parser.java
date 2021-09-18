@@ -219,13 +219,24 @@ public class Parser {
         Token name = consume(IDENTIFIER, "Expect class name.");
         consume(LEFT_BRACE, "Expect '{' before class body.");
 
+        List<Stmt.Function> staticMethods = new ArrayList<>();
         List<Stmt.Function> methods = new ArrayList<>();
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
-            methods.add(function("method"));
+            // parse static methods
+            if (check(CLASS)) {
+                staticMethods.add(staticFunction());
+            } else {
+                methods.add(function("method"));
+            }
         }
 
         consume(RIGHT_BRACE, "Expect '}' after class body.");
-        return new Stmt.Class(name, methods);
+        return new Stmt.Class(name, methods, staticMethods);
+    }
+
+    private Stmt.Function staticFunction() {
+        consume(CLASS, "Assume static methods have 'class' keyword.");
+        return function("static");
     }
 
     private Stmt varDeclaration() {
