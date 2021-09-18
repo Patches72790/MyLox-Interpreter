@@ -1,7 +1,19 @@
-class Bacon {
-    eat() {
-        print "crunch";
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "The " + this.flavor + " cake is " +adjective + "!";
     }
 }
 
-Bacon().eat();
+class Thing {
+    getCallback() {
+        var localFunction = fun () {
+            print this;
+        };
+
+        return localFunction;
+    }
+}
+
+var callback = Thing().getCallback();
+callback();
