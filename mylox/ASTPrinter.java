@@ -97,16 +97,21 @@ public class ASTPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitGetExpr(Expr.Get expr) {
-        return null;
+        return "get";
     }
 
     @Override
     public String visitSetExpr(Expr.Set expr) {
-        return null;
+        return "set"; 
     }
 
     @Override
     public String visitThisExpr(Expr.This expr) {
         return "this";
+    }
+
+    @Override
+    public String visitSuperExpr(Expr.Super expr) {
+        return "<superclass>" + expr.keyword.lexeme;
     }
 }

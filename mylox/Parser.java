@@ -194,14 +194,14 @@ public class Parser {
 
     private Stmt declaration() {
         try {
-            if (match(CLASS)) return classDeclaration();
+            if (match(CLASS))
+                return classDeclaration();
             if (check(FUN))
                 // HACK -- VERY hacky way of checking for function expression statements
                 // that needs to lookahead to current + 1 without consuming FUN token
                 if (checkLookaheadOne(LEFT_PAREN)) {
                     return expressionStatement();
-                }
-                else {
+                } else {
                     match(FUN);
                     return function("function");
                 }
@@ -217,6 +217,13 @@ public class Parser {
 
     private Stmt classDeclaration() {
         Token name = consume(IDENTIFIER, "Expect class name.");
+
+        Expr.Variable superclass = null;
+        if (match(LESS)) {
+            consume(IDENTIFIER, "Expect superclass name.");
+            superclass = new Expr.Variable(previous());
+        }
+
         consume(LEFT_BRACE, "Expect '{' before class body.");
 
         List<Stmt.Function> methods = new ArrayList<>();
@@ -225,7 +232,7 @@ public class Parser {
         }
 
         consume(RIGHT_BRACE, "Expect '}' after class body.");
-        return new Stmt.Class(name, methods);
+        return new Stmt.Class(name, superclass, methods);
     }
 
     private Stmt varDeclaration() {
@@ -325,7 +332,7 @@ public class Parser {
         // TODO -- need to re-implement the FOR statement
         // for interpreter because currently this introduces
         // an extra BLOCK AST node that breaks the resolver
-        
+
         // the increment is executed as final statement of block
         if (increment != null) {
             body.add(new Stmt.Expression(increment));
@@ -463,8 +470,8 @@ public class Parser {
             if (expr instanceof Expr.Variable) {
                 Token name = ((Expr.Variable) expr).name;
                 /*
-                 * TODO -- parsing for ternary operator 
-                */
+                 * TODO -- parsing for ternary operator
+                 */
                 return new Expr.Assign(name, value);
             } else if (expr instanceof Expr.Get) {
                 Expr.Get get = (Expr.Get) expr;
@@ -609,6 +616,13 @@ public class Parser {
         // parse literals
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super'.");
+            Token method = consume(IDENTIFIER, "Expect superclass method name.");
+            return new Expr.Super(keyword, method);
         }
 
         if (match(THIS)) {

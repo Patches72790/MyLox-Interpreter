@@ -24,7 +24,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     private enum ClassType {
         NONE,
-        CLASS
+        CLASS,
+        SUBCLASS
     }
 
     // Wrapping method for visiting AST nodes as Resolver
@@ -46,21 +47,22 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     /**
      * Push a new map onto the stack of scopes currently
      * being analyzed.
-     */ 
+     */
     private void beginScope() {
         scopes.push(new HashMap<String, Boolean>());
     }
 
     /**
      * Pop the map from the stack when the scope is finished.
-     */ 
+     */
     private void endScope() {
         scopes.pop();
     }
 
     // variable is declared but not ready for use yet
     private void declare(Token name) {
-        if (scopes.isEmpty()) return;
+        if (scopes.isEmpty())
+            return;
 
         Map<String, Boolean> scope = scopes.peek();
         // no re-declaration of variables in same scope
@@ -68,12 +70,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             Lox.error(name, "Already a variable with this name in this scope.");
         }
         scope.put(name.lexeme, false); // create scope and put name there
-                                        // declared but not used yet
+                                       // declared but not used yet
     }
 
     // variable exists and is now available for use
     private void define(Token name) {
-        if (scopes.isEmpty()) return;
+        if (scopes.isEmpty())
+            return;
         scopes.peek().put(name.lexeme, true);
     }
 
@@ -87,7 +90,6 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             }
         }
     }
-
 
     private void resolveFunction(Stmt.Function function, FunctionType type) {
         // save current function type during resolution
@@ -105,7 +107,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         currentFunction = enclosingFunction;
     }
 
-    // identical to resolveFunction except requires expression 
+    // identical to resolveFunction except requires expression
     // as parameter
     private void resolveAnonFunction(Expr.AnonFunction function, FunctionType type) {
         FunctionType enclosingFunction = currentFunction;
@@ -130,6 +132,20 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         declare(stmt.name);
         define(stmt.name);
 
+        if (stmt.superclass != null && stmt.name.lexeme.equals(stmt.superclass.name.lexeme)) {
+            Lox.error(stmt.superclass.name, "A class can't inherit from itself.");
+        }
+
+        if (stmt.superclass != null) {
+            currentClass = ClassType.SUBCLASS;
+            resolve(stmt.superclass);
+        }
+
+        if (stmt.superclass != null) {
+            beginScope();
+            scopes.peek().put("super", true);
+        }
+
         beginScope();
         scopes.peek().put("this", true); // this is inserted as variable into all classes in implicit scope
 
@@ -142,7 +158,23 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         endScope();
+
+        if (stmt.superclass != null) {
+            endScope();
+        }
+
         currentClass = enclosingClass;
+        return null;
+    }
+
+    @Override
+    public Void visitSuperExpr(Expr.Super expr) {
+        if (currentClass == ClassType.NONE) {
+            Lox.error(expr.keyword, "Can't use 'super' outside of a class.");
+        } else if (currentClass != ClassType.CLASS) {
+            Lox.error(expr.keyword, "Can't use 'super' in a class with no superclass.");
+        }
+        resolveLocal(expr, expr.keyword);
         return null;
     }
 
@@ -185,7 +217,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             resolve(stmt.initializer);
         }
         define(stmt.name);
-        return null; 
+        return null;
     }
 
     @Override
@@ -208,7 +240,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     @Override
     public Void visitAnonFunctionExpr(Expr.AnonFunction expr) {
-        // identical to visitFunctionStmt except no need to 
+        // identical to visitFunctionStmt except no need to
         // declare/define name
         resolveAnonFunction(expr, FunctionType.FUNCTION);
         return null;
@@ -224,7 +256,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitIfStmt(Stmt.If stmt) {
         resolve(stmt.condition);
         resolve(stmt.thenBranch);
-        if (stmt.elseBranch != null) resolve(stmt.elseBranch);
+        if (stmt.elseBranch != null)
+            resolve(stmt.elseBranch);
         return null;
     }
 
@@ -262,7 +295,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         resolve(stmt.body);
         return null;
     }
-    
+
     @Override
     public Void visitBreakStmt(Stmt.Break stmt) {
         return null;

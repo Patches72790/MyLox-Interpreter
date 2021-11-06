@@ -22,7 +22,7 @@ public class GenerateAST {
                 "Unary    : Token operator, Expr right", "Variable : Token name", "Assign   : Token name, Expr value",
                 "AnonFunction : List<Token> params, List<Stmt> body",
                 "Get      : Expr object, Token name", "Set    : Expr object, Token name, Expr value",
-                "This     : Token keyword"),
+                "This     : Token keyword", "Super : Token keyword, Token method"),
                 null);
 
         defineAst(outputDir, "Stmt",
@@ -32,7 +32,7 @@ public class GenerateAST {
                         "Print      : Expr expression", "Var        : Token name, Expr initializer",
                         "Break      : Token breakToken", "Return     : Token keyword, Expr value", 
                         "For        : Stmt initializer, Expr condition, Expr increment, List<Stmt> body",
-                        "Class      : Token name, List<Stmt.Function> methods"),
+                        "Class      : Token name, Expr.Variable superclass, List<Stmt.Function> methods"),
                 null);
     }
 
